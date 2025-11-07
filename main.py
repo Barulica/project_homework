@@ -28,11 +28,13 @@ while options is None or options == "":
         options = None
     elif options == "3":
         rented_cars = Car()
-        print(rented_cars.show_rented_or_available_cars(3))
+        result = rented_cars.show_rented_or_available_cars(3)
+        rented_cars.format_cars_table(result)
         options = None
     elif options == "4":
         available_cars = Car()
-        print(available_cars.show_rented_or_available_cars(4))
+        result = available_cars.show_rented_or_available_cars(4)
+        available_cars.format_cars_table(result)
         options = None
     elif options == "5":
         available_to_rent = Car()
@@ -55,7 +57,7 @@ while options is None or options == "":
             print("Invalid option")
             options = None
     elif options == "6":
-        print("exit")
+        print("Thank you for your time! See you again!")
         break
     else:
         print("Invalid option")

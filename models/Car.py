@@ -1,3 +1,4 @@
+from datetime import datetime
 
 from models.Db import Db
 
@@ -72,9 +73,9 @@ class Car(Db):
         cursor = self._connection.cursor()
         option = str(option)
         if option == "3":
-            cursor.execute('SELECT * FROM cars WHERE rented = False')
-        else:
             cursor.execute('SELECT * FROM cars WHERE rented = True')
+        else:
+            cursor.execute('SELECT * FROM cars WHERE rented = False')
         result = cursor.fetchall()
         cursor.close()
 
@@ -94,7 +95,7 @@ class Car(Db):
 
     def rent_a_car(self):
         cursor = self._connection.cursor()
-        cursor.execute('''UPDATE cars SET car_rented_until = date_trunc('minute', NOW() + INTERVAL '7 days') WHERE brand = %s and model = %s and production_year = %s''',
+        cursor.execute('''UPDATE cars SET rented = FALSE, car_rented_until = date_trunc('minute', NOW() + INTERVAL '7 days') WHERE brand = %s and model = %s and production_year = %s''',
                        (self.brand, self.model, self.production_year))
 
         cursor.execute('''SELECT car_rented_until FROM cars WHERE brand = %s AND model = %s AND production_year = %s''', (self.brand, self.model, self.production_year))
@@ -104,6 +105,25 @@ class Car(Db):
         cursor.close()
 
         return result[0] if result else None
+
+    def format_cars_table(self, cars):
+        print(f"{'ID':<3} {'Marka':<10} {'Model':<10} {'Godina':<6} {'Rented':<8} {'Remaining Time':<20}")
+        print("-" * 60)
+        for car in cars:
+            car_id, brand, model, year, rented, rented_until = car
+            if rented_until:
+                remaining = rented_until - datetime.now()
+                if remaining.days >= 1:
+                    remaining_str = f"{remaining.days} days"
+                else:
+                    remaining_hours = remaining.total_seconds() / 3600
+                    remaining_str  = f"{int(remaining_hours)} hours"
+            else:
+                remaining_str = "N/A"
+
+            print(f"{car_id:<3} {brand:<10} {model:<10} {year:<6} {str(rented):<8} {remaining_str:<20}")
+
+
 
 
 
