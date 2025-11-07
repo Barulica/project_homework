@@ -1,36 +1,14 @@
-class Car:
-    cars = {
-        "Audi": [
-            {"model": "A4", "production_year": 2004},
-            {"model": "A6", "production_year": 2010},
-            {"model": "Q5", "production_year": 2015}
-        ],
-        "BMW": [
-            {"model": "320i", "production_year": 2008},
-            {"model": "X3", "production_year": 2013},
-            {"model": "M3", "production_year": 2016}
-        ],
-        "Mercedes": [
-            {"model": "C200", "production_year": 2012},
-            {"model": "E220", "production_year": 2014},
-            {"model": "GLA", "production_year": 2018}
-        ],
-        "Volkswagen": [
-            {"model": "Golf 6", "production_year": 2010},
-            {"model": "Passat B7", "production_year": 2011},
-            {"model": "Tiguan", "production_year": 2017}
-        ],
-        "Opel": [
-            {"model": "Astra H", "production_year": 2007},
-            {"model": "Insignia", "production_year": 2013},
-            {"model": "Corsa D", "production_year": 2009}
-        ]
-    }
+
+from models.Db import Db
+
+class Car(Db):
 
     def __init__(self):
+        super().__init__()
         self.__brand = None
         self.__model = None
         self.__production_year = None
+
 
     @property
     def brand(self):
@@ -38,7 +16,15 @@ class Car:
 
     @brand.setter
     def brand(self, brand):
-        if brand not in Car.cars:
+        cursor = self._connection.cursor()
+        cursor.execute('SELECT DISTINCT brand FROM cars')
+        brands_raw = cursor.fetchall()
+        self._connection.commit()
+        cursor.close()
+
+        brands = [b[0] for b in brands_raw]
+
+        if brand not in brands:
             raise ValueError("Invalid brand")
         self.__brand = brand
 
@@ -48,19 +34,18 @@ class Car:
 
     @model.setter
     def model(self, model):
+        cursor = self._connection.cursor()
+        cursor.execute('SELECT model FROM cars')
+        models_raw = cursor.fetchall()
+        self._connection.commit()
+        cursor.close()
 
-        if self.__brand is None:
-            raise ValueError("Must be set")
-        valid_models = [car['model'] for car in Car.cars[self.__brand]]
+        models = [m[0] for m in models_raw]
 
-        if model not in valid_models:
+        if model not in models:
             raise ValueError("Invalid model")
-
         self.__model = model
 
-        for car_model in Car.cars[self.__brand]:
-            if car_model['model'] == model:
-                self.__production_year = car_model['production_year']
 
     @property
     def production_year(self):
@@ -68,14 +53,59 @@ class Car:
 
     @production_year.setter
     def production_year(self, production_year):
-        if self.__model is None or self.__production_year is not None:
-            raise ValueError("Model or production year is None")
+        production_year = int(production_year)
 
+        cursor = self._connection.cursor()
+        cursor.execute('SELECT production_year FROM cars')
+        production_years_raw = cursor.fetchall()
+        self._connection.commit()
+        cursor.close()
+
+        production_years = [p[0] for p in production_years_raw]
+
+        if production_year not in production_years:
+            raise ValueError("Invalid year")
         self.__production_year = production_year
 
 
-audi = Car()
+    def show_rented_or_available_cars(self, option):
+        cursor = self._connection.cursor()
+        option = str(option)
+        if option == "3":
+            cursor.execute('SELECT * FROM cars WHERE rented = False')
+        else:
+            cursor.execute('SELECT * FROM cars WHERE rented = True')
+        result = cursor.fetchall()
+        cursor.close()
 
-audi.brand = "Audi"
-audi.model = "A4"
-print(audi.production_year)
+        return result
+
+    def available_to_rent_by_brand(self, brand, model, production_year):
+        cursor = self._connection.cursor()
+        cursor.execute("SELECT rented FROM cars WHERE brand = %s AND model = %s AND production_year = %s", (brand, model, str(production_year)))
+        result = cursor.fetchone()
+        cursor.close()
+
+
+        if result is None:
+            return None
+
+        return result[0]
+
+    def rent_a_car(self):
+        cursor = self._connection.cursor()
+        cursor.execute('''UPDATE cars SET car_rented_until = date_trunc('minute', NOW() + INTERVAL '7 days') WHERE brand = %s and model = %s and production_year = %s''',
+                       (self.brand, self.model, self.production_year))
+
+        cursor.execute('''SELECT car_rented_until FROM cars WHERE brand = %s AND model = %s AND production_year = %s''', (self.brand, self.model, self.production_year))
+        result = cursor.fetchone()
+
+        self._connection.commit()
+        cursor.close()
+
+        return result[0] if result else None
+
+
+
+
+
