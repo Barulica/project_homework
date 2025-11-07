@@ -23,4 +23,11 @@ class User(Db):
 
     @name.setter
     def name(self, name):
+        split_name = name.split()
+
+        if len(split_name) < 2:
+            raise ValueError("Name has to be in first last name format!")
         self.__name = name
+
+toma = User()
+toma.name = "Tomislav Nikolic"
