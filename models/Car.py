@@ -1,34 +1,31 @@
 class Car:
-
     cars = {
-    "Audi": [
-        {"model": "A4", "production_year": 2004},
-        {"model": "A6", "production_year": 2010},
-        {"model": "Q5", "production_year": 2015}
-    ],
-    "BMW": [
-        {"model": "320i", "production_year": 2008},
-        {"model": "X3", "production_year": 2013},
-        {"model": "M3", "production_year": 2016}
-    ],
-    "Mercedes": [
-        {"model": "C200", "production_year": 2012},
-        {"model": "E220", "production_year": 2014},
-        {"model": "GLA", "production_year": 2018}
-    ],
-    "Volkswagen": [
-        {"model": "Golf 6", "production_year": 2010},
-        {"model": "Passat B7", "production_year": 2011},
-        {"model": "Tiguan", "production_year": 2017}
-    ],
-    "Opel": [
-        {"model": "Astra H", "production_year": 2007},
-        {"model": "Insignia", "production_year": 2013},
-        {"model": "Corsa D", "production_year": 2009}
-    ]
-}
-
-
+        "Audi": [
+            {"model": "A4", "production_year": 2004},
+            {"model": "A6", "production_year": 2010},
+            {"model": "Q5", "production_year": 2015}
+        ],
+        "BMW": [
+            {"model": "320i", "production_year": 2008},
+            {"model": "X3", "production_year": 2013},
+            {"model": "M3", "production_year": 2016}
+        ],
+        "Mercedes": [
+            {"model": "C200", "production_year": 2012},
+            {"model": "E220", "production_year": 2014},
+            {"model": "GLA", "production_year": 2018}
+        ],
+        "Volkswagen": [
+            {"model": "Golf 6", "production_year": 2010},
+            {"model": "Passat B7", "production_year": 2011},
+            {"model": "Tiguan", "production_year": 2017}
+        ],
+        "Opel": [
+            {"model": "Astra H", "production_year": 2007},
+            {"model": "Insignia", "production_year": 2013},
+            {"model": "Corsa D", "production_year": 2009}
+        ]
+    }
 
     def __init__(self):
         self.__brand = None
@@ -48,6 +45,7 @@ class Car:
     @property
     def model(self):
         return self.__model
+
     @model.setter
     def model(self, model):
 
@@ -74,6 +72,8 @@ class Car:
             raise ValueError("Model or production year is None")
 
         self.__production_year = production_year
+
+
 audi = Car()
 
 audi.brand = "Audi"
