@@ -40,8 +40,18 @@ while options is None or options == "":
         available_to_rent = Car()
         car_by_id_or_brand = input("Do you want the car by id or brand? ")
         if car_by_id_or_brand == "id":
-            id = input("Enter the id: ")
-            options = None
+            id = int(input("Enter the id: "))
+            car = (available_to_rent.available_to_rent_by_id(id))
+            available_to_rent.brand = car['brand']
+            available_to_rent.model = car['model']
+            available_to_rent.production_year = car['production_year']
+            if car['rented'] is False:
+                print(f"You rented {car['brand']} {car['model']} until {available_to_rent.rent_a_car()}")
+                available_to_rent.rent_a_car()
+                options = None
+            else:
+                print("This car is already rented")
+                options = None
         elif car_by_id_or_brand == "brand":
             available_to_rent.brand = input ("Enter brand: \n")
             available_to_rent.model = input("Enter model: \n")
@@ -53,6 +63,7 @@ while options is None or options == "":
                 options = None
             else:
                 print("This car is already rented")
+                options = None
         else:
             print("Invalid option")
             options = None

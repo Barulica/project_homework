@@ -80,6 +80,22 @@ class Car(Db):
         cursor.close()
 
         return result
+    def available_to_rent_by_id(self,id):
+        cursor = self._connection.cursor()
+        cursor.execute('''SELECT rented, brand, model, production_year FROM cars WHERE id = %s''', (id,))
+        result = cursor.fetchone()
+        cursor.close()
+
+        if result is None:
+            return None
+
+        return {
+            "rented": result[0],
+            "brand": result[1],
+            "model": result[2],
+            "production_year": result[3]
+        }
+
 
     def available_to_rent_by_brand(self, brand, model, production_year):
         cursor = self._connection.cursor()
